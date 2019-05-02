@@ -1,0 +1,94 @@
+//-------------------------------------------------------------------------
+// Materials Parameters Database
+//------------------------------------------------------------------------
+//
+<materbase(2.21)> // file and version signature
+//
+// DGG. CIN2. April 2014
+// NOTE: It would be desirable to recalculate all coefficients using lambda experimental
+//
+//-------------------------------------------------------------------------
+// define AlGaAs(x) material at 0.85um
+// x is Al content
+// define AlGaAs(x) material at 0.85um
+// this is my personal definition.
+// reference: http://refractiveindex.info
+// /legacy/?group=CRYSTALS&material=AlGaAs&option=0&wavelength=0.85
+BEGIN AlGaAs(x)
+RIX_POLYX   	2  3.646  -0.822  	// N, Cn: refractive index poly ne(x)
+RIX_POLYT   	2  0.0    0.004    	// T-dependence 0.01/degree Celcius
+//MATLOSS_POLYX	1  7e3				// N, Cn: mat absorption coefficient poly alpha(x)
+THCON       	1     				// thermal conductivity
+TEMP_REF   		25
+END
+//----------------------------------------------------------------------
+// define material for GaAs, nb user is responsible for ensuring x-parameter is zero!
+BEGIN GaAs() << AlGaAs() // material name and template
+END
+//----------------------------------------------------------------------
+// define InGaAsP(x) material at 1.55 um
+// refractive index is for InGaAsP at the corresponding bandgap,
+// and lattice matched to InP
+// x is As content
+BEGIN InGaAsP(x)    // material name
+ANAL_INGAASP1 20 0  // loads internal InGaAsP model at 20 Celcius
+END
+//----------------------------------------------------------------------
+// define InP(x),  nb user is responsible for ensuring x-parameter is zero!
+BEGIN InP(x) << InGaAsP() // material name
+END
+//----------------------------------------------------------------------
+// define Silicon at 20 Celcius,  nb x is ignored
+BEGIN Si(x)      // material name
+ANAL_SILICON1 20 0  // loads internal Silicon model at 20 Celcius
+END
+//----------------------------------------------------------------------
+// define Silica,  nb x is ignored, temperature independent
+BEGIN SiO2(x)      // material name
+ANAL_SILICA1 0 0   // loads internal Silica model 
+END
+//----------------------------------------------------------------------
+// Defined by DGG CIN2 April 2014
+// reference: http://refractiveindex.info/legacy/?group=CRYSTALS&material=Si3N4&wavelength=0.633
+// define Silicon Nitride(x), x is ignored
+BEGIN Si3N4(x) // material name
+RIX_POLYX		2  2.0   -0.122   	// N, Cn: refractive index poly rix(x)
+// MATLOSS_POLYX  1  10.0   	  	// N, Cn: mat absorption poly
+END
+//----------------------------------------------------------------------
+// Defined by DGG CIN2 April 2014
+// reference: http://refractiveindex.info/legacy/?group=CRYSTALS&material=SiO2&option=F_SILICA&wavelength=0.633
+// define Silicon Oxide(x), x is ignored
+BEGIN SiO2fix(x) // material name
+RIX_POLYX		2  1.46   -0.029   	// N, Cn: refractive index poly rix(x)
+END
+//----------------------------------------------------------------------
+// define Aluminium(x), x is ignored
+BEGIN aluminium(x)    // material name
+ANAL_ALUMINIUM  0 0   // loads internal model for Aluminium, valid from 0.4 to 1.75um
+END
+//----------------------------------------------------------------------
+// define Gold(x), x is ignored
+BEGIN gold(x)    // material name
+ANAL_GOLD  0 0   // loads internal model for gold, valid from 0.4 to 1.75um
+END
+//----------------------------------------------------------------------
+// define tungsten(x), x is ignored
+BEGIN tungsten(x)  // material name
+ANAL_TUNGSTEN 0 0  // loads internal model for tungsten, valid from 0.4 to 1.75um
+END
+//----------------------------------------------------------------------
+// dummy, SLAB=DEFAULT:
+// this material may be used to explicitly define the refractive index in a
+// slab list, eg SLAB(3.17),
+BEGIN SLAB() // material name
+RIX_POLYX      2  0.0   1.0   // N, Cn: refractive index poly rix(x)
+MATLOSS_POLYX  1  10.0   	  // N, Cn: mat absorption poly
+END
+//----------------------------------------------------------------------
+BEGIN AIR()  // material name
+RIX_POLYX      1  1.0  // N, Cn: refractive index poly rix(x)
+MATLOSS_POLYX  1  0.0  // N, Cn: mat absorption poly alpha(x)
+THCON          1e-8     // thermal conductivity
+END
+//----------------------------------------------------------------------

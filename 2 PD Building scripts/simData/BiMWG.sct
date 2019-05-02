@@ -1,0 +1,293 @@
+//***************************************************************************************
+// FILE BiMWG.sct 																		*
+// DESCRIPTION:																			*
+// BUILDING a bimodal waveguide for modal studies										*
+// REVISION: 1.0 	14.04																*
+// NOTES: initial tests	 																*
+// COPYRIGHT																			*
+// DGG April 2014, @CIN2																*
+//***************************************************************************************
+//Define a log file????
+//Start defining some variables???? h, l, w, to automatically update it all over the scriptMain
+//The same for the wavelenght and other variables
+//close all projects
+app.closeall()
+
+//starts new project and change the reference to scriptMain main Node
+app.addsubnode(fimmwave_prj,"BiModalWG")
+Ref& scriptMain = app.findnode("BiModalWG")
+
+//********* 1.1 Build the SingleMode Slab ******************************************************
+//build slab waveguide basic. Dimmensions for Single Mode
+
+//start adding a subnode and changing the reference to singleModeSlab
+scriptMain.addsubnode(slabwgNode,"SingleModeWG")
+Ref& SingleModeSlab = app.subnodes[1].findnode("SingleModeWG")
+
+//set material DB
+SingleModeSlab.setmaterbase(BiMWbase.mat)
+//add 3 layers SiO2-Si3N4-SiO2
+//substrate
+SingleModeSlab.insertlayer(1)
+SingleModeSlab.layers[1].size=2
+SingleModeSlab.layers[1].nr11=1.46
+SingleModeSlab.layers[1].nr22=1.46
+SingleModeSlab.layers[1].nr33=1.46
+//SingleModeSlab.layers[1].setMAT(SiO2fix)
+//core
+SingleModeSlab.insertlayer(2)
+SingleModeSlab.layers[2].size=0.150          //single mode core thickness
+SingleModeSlab.layers[2].nr11=2
+SingleModeSlab.layers[2].nr22=2
+SingleModeSlab.layers[2].nr33=2
+//SingleModeSlab.layers[2].setMAT(Si3N4)
+//top cladding
+SingleModeSlab.insertlayer(3)
+SingleModeSlab.layers[3].size=1.69			//to cover the top
+SingleModeSlab.layers[3].nr11=1.46
+SingleModeSlab.layers[3].nr22=1.46
+SingleModeSlab.layers[3].nr33=1.46
+//SingleModeSlab.layers[3].setMAT(SiO2fix)
+// end of SingleMode slab WG *************************************************************
+
+//********* 1.2 Build the Bimodal Slab ******************************************************
+//build slab waveguide basic. Dimmensions for bimodal
+
+//start adding a sub node for the slab WG and change the reference to BiModeSlab
+scriptMain.addsubnode(slabwgNode,"BiMW1")
+Ref& BiModeSlab = app.subnodes[1].findnode("BiMW1")
+//set material DB
+BiModeSlab.setmaterbase(BiMWbase.mat)
+//add 3 layers SiO2-Si3N4-SiO2
+//substrate
+BiModeSlab.insertlayer(1)
+BiModeSlab.layers[1].size=2
+BiModeSlab.layers[1].nr11=1.46
+BiModeSlab.layers[1].nr22=1.46
+BiModeSlab.layers[1].nr33=1.46
+//BiModeSlab.layers[1].setMAT(SiO2fix)
+//core
+BiModeSlab.insertlayer(2)
+BiModeSlab.layers[2].size=0.34				//Multiple Modes core thickness
+BiModeSlab.layers[2].nr11=2
+BiModeSlab.layers[2].nr22=2
+BiModeSlab.layers[2].nr33=2
+//BiModeSlab.layers[2].setMAT(Si3N4)
+//top cladding
+BiModeSlab.insertlayer(3)
+BiModeSlab.layers[3].size=1.5
+BiModeSlab.layers[3].nr11=1.46
+BiModeSlab.layers[3].nr22=1.46
+BiModeSlab.layers[3].nr33=1.46
+//BiModeSlab.layers[3].setMAT(SiO2fix)
+// end of bimodal slab WG *************************************************************
+
+
+//********* 1.3 Build the Bimodal Slab with sensing area*******************************
+//build slab waveguide basic. Dimmensions for bimodal
+
+//start adding a sub node for the slab WG and change the reference to BiModeSlab
+scriptMain.addsubnode(slabwgNode,"BiMWsa")
+Ref& BiModeSlabSA = app.subnodes[1].findnode("BiMWsa")
+//set material DB
+BiModeSlabSA.setmaterbase(BiMWbase.mat)
+//add 3 layers SiO2-Si3N4-AIR
+//substrate
+BiModeSlabSA.insertlayer(1)
+BiModeSlabSA.layers[1].size=2
+//BiModeSlabSA.layers[1].setMAT(SiO2fix)
+BiModeSlabSA.layers[1].nr11=1.46
+BiModeSlabSA.layers[1].nr22=1.46
+BiModeSlabSA.layers[1].nr33=1.46
+//core
+BiModeSlabSA.insertlayer(2)
+BiModeSlabSA.layers[2].size=0.34				//Multiple Modes core thickness
+//BiModeSlabSA.layers[2].setMAT(Si3N4)
+BiModeSlabSA.layers[2].nr11=2.0
+BiModeSlabSA.layers[2].nr22=2.0
+BiModeSlabSA.layers[2].nr33=2.0
+
+//top cladding
+BiModeSlabSA.insertlayer(3)
+BiModeSlabSA.layers[3].size=1.5
+//BiModeSlabSA.layers[3].setMAT(AIR)
+BiModeSlabSA.layers[3].nr11=1.33
+BiModeSlabSA.layers[3].nr22=1.33
+BiModeSlabSA.layers[3].nr33=1.33
+// end of bimodal slab WG *************************************************************
+
+
+
+
+
+
+
+//************** Sections 2 and 4 buried BiModal WG Section *************************************
+// Sections 2 and 4 consist of a bimodal RWG covered with top cladding SiO2 					*
+//Building Rectangular WG for bimodal sections 2 and 4 											*
+//Build the rectangular WG using 3 slabs from section 1.1 and etching as required				*
+//The conformation is 2 um SiO2, 0.34 um Si3N4 for core, and 1.5 um of SiO2 as top cladding		*
+//***********************************************************************************************
+// Define Name, materials DB
+scriptMain.addsubnode(rwguideNode, "BimodalSection")
+Ref& BimodalSection = app.subnodes[1].findnode("BimodalSection")
+BimodalSection.writeblock("Sections 2 and 4 consist of a bimodal RWG covered with top cladding SiO2")
+BimodalSection.setmaterbase(BiMWbase.mat)
+BimodalSection.insertslice(1)
+BimodalSection.insertslice(1)
+BimodalSection.insertslice(1)
+BiModeSlab.copy()					//copy the slab WG from section 1.1
+//Left slab
+BimodalSection.pasteslabref(1)
+BimodalSection.slices[1].width=50		//when running real simulations change this value to 50 micrometers at least
+BimodalSection.slices[1].etch = 1.5015  //1.5 um of SiO2 layer and 1.5 nm rib
+//center slab
+BimodalSection.pasteslabref(2)
+BimodalSection.slices[2].width=4
+BimodalSection.slices[2].etch = 0		//no etch... this is the rib
+//right slab
+BimodalSection.pasteslabref(3)
+BimodalSection.slices[3].width=50		//change to 50 micrometers when simulating
+BimodalSection.slices[3].etch = 1.5015	//1.5 um of SiO2 and 1.5nm rib
+BimodalSection.updateviews
+//BOUNDARY CONDITIONS
+BimodalSection.lhsbc.type=1
+BimodalSection.rhsbc.type=1
+//SET MOLAB PARAMETERS
+BimodalSection.evlist.svp.lambda=0.633
+BimodalSection.evlist.svp.hcurv=0
+BimodalSection.evlist.svp.solvid=14
+BimodalSection.evlist.svp.hsymmetry=0
+BimodalSection.evlist.svp.vsymmetry=0
+BimodalSection.evlist.svp.buff=V3 0 300 300 15 25 0 5 5
+BimodalSection.evlist.mlp.autorun=1
+BimodalSection.evlist.mlp.speed=0
+BimodalSection.evlist.mlp.mintefrac=0
+BimodalSection.evlist.mlp.maxtefrac=100
+BimodalSection.evlist.mlp.maxnmodes=200
+BimodalSection.evlist.mlp.evstart=1e+050
+BimodalSection.evlist.mlp.evend=-1e+050
+BimodalSection.evlist.mlp.nx=200
+BimodalSection.evlist.mlp.ny=90
+// end of bimodal section WG ********************************************************************
+
+//************** Section 3 Bimodal sensing area *************************************************
+// Section 3 consist of a bimodal RWG with removed (etched) cladding							*
+//Building Rectangular WG for bimodal section 3													*
+//Build the rectangular WG using 3 slabs from section 1.1 and etching as required				*
+//The conformation is 2 um SiO2, 0.34 um Si3N4 for core, and air or liquid as top cladding		*
+//***********************************************************************************************
+
+// Define Name, materials DB
+scriptMain.addsubnode(rwguideNode, "BimodalSensingArea")
+Ref& BimodalSensingArea = app.subnodes[1].findnode("BimodalSensingArea")
+BimodalSensingArea.writeblock("Sections 3 consist of a bimodal RWG with etched cladding for sensing purposes")
+BimodalSensingArea.setmaterbase(BiMWbase.mat)
+BimodalSensingArea.insertslice(1)
+BimodalSensingArea.insertslice(1)
+BimodalSensingArea.insertslice(1)
+BiModeSlabSA.copy()					//copy the slab WG from section 1.1
+//Left slab
+BimodalSensingArea.pasteslabref(1)
+BimodalSensingArea.slices[1].width=50		//when running real simulations change this value to 50 micrometers at least
+BimodalSensingArea.slices[1].etch = 1.5015  //1.5 um of SiO2 layer and 1.5 nm rib
+//center slab
+BimodalSensingArea.pasteslabref(2)
+BimodalSensingArea.slices[2].width=4
+BimodalSensingArea.slices[2].etch = 1.5		// Etch to remove the cladding
+//right slab
+BimodalSensingArea.pasteslabref(3)
+BimodalSensingArea.slices[3].width=50		//change to 50 micrometers when simulating
+BimodalSensingArea.slices[3].etch = 1.5015	//1.5 um of SiO2 and 1.5nm rib
+BimodalSensingArea.updateviews
+//BOUNDARY CONDITIONS
+BimodalSensingArea.lhsbc.type=1
+BimodalSensingArea.rhsbc.type=1
+//SET MOLAB PARAMETERS
+BimodalSensingArea.evlist.svp.lambda=0.633
+BimodalSensingArea.evlist.svp.hcurv=0
+BimodalSensingArea.evlist.svp.solvid=14
+BimodalSensingArea.evlist.svp.hsymmetry=0
+BimodalSensingArea.evlist.svp.vsymmetry=0
+BimodalSensingArea.evlist.svp.buff=V3 0 300 300 15 25 0 5 5
+BimodalSensingArea.evlist.mlp.autorun=1
+BimodalSensingArea.evlist.mlp.speed=0
+BimodalSensingArea.evlist.mlp.mintefrac=0
+BimodalSensingArea.evlist.mlp.maxtefrac=100
+BimodalSensingArea.evlist.mlp.maxnmodes=5
+BimodalSensingArea.evlist.mlp.evstart=1e+050
+BimodalSensingArea.evlist.mlp.evend=-1e+050
+BimodalSensingArea.evlist.mlp.nx=200
+BimodalSensingArea.evlist.mlp.ny=90
+// end of bimodal sensing section WG ********************************************************************
+
+//************** Section 1 Single mode WG *******************************************************
+// Section 1 consist of a bimodal RWG with removed (etched) cladding							*
+//Building Rectangular WG for bimodal section 3													*
+//Build the rectangular WG using 3 slabs from section 1.1 and etching as required				*
+//The conformation is 2 um SiO2, 0.34 um Si3N4 for core, and air or liquid as top cladding		*
+//***********************************************************************************************
+
+// Define Name, materials DB
+scriptMain.addsubnode(rwguideNode, "SingleModeSection")
+Ref& SingleModeSection = app.subnodes[1].findnode("SingleModeSection")
+SingleModeSection.writeblock("Section 1 consist of a single mode RWG")
+SingleModeSection.setmaterbase(BiMWbase.mat)
+SingleModeSection.insertslice(1)
+SingleModeSection.insertslice(1)
+SingleModeSection.insertslice(1)
+SingleModeSlab.copy()					//copy the slab WG from section 1.1
+//Left slab
+SingleModeSection.pasteslabref(1)
+SingleModeSection.slices[1].width=50		//when running real simulations change this value to 50 micrometers at least
+SingleModeSection.slices[1].etch = 1.6915 	//1.69 um of SiO2 layer and 1.5 nm rib
+//center slab
+SingleModeSection.pasteslabref(2)
+SingleModeSection.slices[2].width=4
+SingleModeSection.slices[2].etch = 0		// Do not etch to keep the core buried and light confined
+//right slab
+SingleModeSection.pasteslabref(3)
+SingleModeSection.slices[3].width=50		//change to 50 micrometers when simulating
+SingleModeSection.slices[3].etch = 1.6915	//1.69 um of SiO2 and 1.5 nm rib
+SingleModeSection.updateviews
+//BOUNDARY CONDITIONS
+SingleModeSection.lhsbc.type=1
+SingleModeSection.rhsbc.type=1
+//SET MOLAB PARAMETERS
+SingleModeSection.evlist.svp.lambda=0.633
+SingleModeSection.evlist.svp.hcurv=0
+SingleModeSection.evlist.svp.solvid=14
+SingleModeSection.evlist.svp.hsymmetry=0
+SingleModeSection.evlist.svp.vsymmetry=0
+SingleModeSection.evlist.svp.buff=V3 0 300 300 15 25 0 5 5
+SingleModeSection.evlist.mlp.autorun=1
+SingleModeSection.evlist.mlp.speed=0
+SingleModeSection.evlist.mlp.mintefrac=0
+SingleModeSection.evlist.mlp.maxtefrac=100
+SingleModeSection.evlist.mlp.maxnmodes=200
+SingleModeSection.evlist.mlp.evstart=1e+050
+SingleModeSection.evlist.mlp.evend=-1e+050
+SingleModeSection.evlist.mlp.nx=200
+SingleModeSection.evlist.mlp.ny=90
+// end of single mode section WG ********************************************************************
+
+//Should I build the 3D device already? or find the modes first?
+// April 15th 2014. Let us find the modes first. Check other file.
+// I won´t finish in one hour left. I will continue tomorrow... check notes
+// Dimmensions for Cdev already defined.
+// app.subnodes[1].subnodes[1].cdev.eltlist[3].length=100 or x.... 
+// check the comlpeted_MMI example in Python for doing a S matrix modal study of 
+// the length variation.
+// should I do as well????
+
+ // April 16th 2014.
+ // This is the plan: 
+ // 1. Find the way to export the EVs to a file and detect where TE00 and or TM00
+ // are no longer transmitted
+ // 2. The same for TE10 and TM10
+ // 3. Build a Python script to vary the thickness and export EVs, then find the 
+ // 4. fastest way to localize the cut-off size
+ // 5. plot it.
+
+ // meanwhile, make another script to build the 3D device.
+ // where we cuold run further studies.
